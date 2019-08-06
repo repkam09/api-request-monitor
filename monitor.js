@@ -6,7 +6,7 @@
 const axios = require("axios");
 const urls = require("./urls.json");
 const fs = require('fs');
-const logfile = "results.txt";
+const logfile = "vgr-func-test-results.txt";
 
 const runtime = Date.now();
 const logdefault = "time, error, name, overtime, responsetime, url \n"
