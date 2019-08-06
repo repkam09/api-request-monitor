@@ -1,0 +1,9 @@
+{
+  "name": "api-request-monitor",
+  "version": "1.0.0",
+  "main": "monitor.js",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.19.0"
+  }
+}
