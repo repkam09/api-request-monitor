@@ -62,7 +62,7 @@ Promise.all(requests).then((results) => {
         }
 
         if (res.error) {
-            console.log("Request '" + res.rid + "' finished with an error: " + res.details.message);
+            console.log("Request '" + res.rid + "' finished with an error: " + res.details.message + " in " + (res.responseTime / 1000) + " seconds" + addString);
         } else {
             console.log("Request '" + res.rid + "' finished in " + (res.responseTime / 1000) + " seconds" + addString);
         }
