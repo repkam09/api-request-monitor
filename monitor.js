@@ -16,7 +16,7 @@ if (!fs.existsSync(logfile)) {
 
 const requests = urls.map((req) => {
     // Make a request via Axios to get the response time
-    return makeRequest(req.rid, req.type, req.url, req.maxtime);
+    return makeRequest(req.rid, req.type, req.url, req.maxtime, req.body);
 });
 
 Promise.all(requests).then((results) => {
@@ -35,14 +35,20 @@ Promise.all(requests).then((results) => {
  * @param {*} type The type of request to make, GET, POST, HEAD, etc
  * @param {*} url The URL that should be requested
  */
-function makeRequest(rid, type, url, timeout) {
+function makeRequest(rid, type, url, timeout, body) {
+    console.log("Starting " + type + " request for " + rid + " [" + url + "]");
     // Grab a start time
     const startTime = new Date();
     return new Promise((resolve) => {
         // Create the axios request object
-        const config = {
+        let config = {
             method: type,
             url: url,
+        }
+
+        if (body) {
+            config.data = body;
+            console.log("   Body: " + JSON.stringify(body));
         }
 
         // Make the axios request to the url
@@ -52,9 +58,12 @@ function makeRequest(rid, type, url, timeout) {
         let overtime = false;
 
         axios.request(config).then((response) => {
-            error = false; details = response;
+            error = false;
+            details = response;
         }).catch((err) => {
-            error = true; details = err;
+            console.log("Error: " + err.message + " for request " + url);
+            error = true;
+            details = err;
         }).finally(() => {
             // Calculate the finish time of the request and return to the promise array
             const endTime = new Date();
@@ -64,7 +73,8 @@ function makeRequest(rid, type, url, timeout) {
                 overtime = true;
             }
 
-            resolve({ error, responseTime: diffTime, details, rid, url, overtime: overtime });
+            const results = { error, responseTime: diffTime, details, rid, url, overtime: overtime };
+            resolve(results);
         });
     });
 }
