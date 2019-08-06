@@ -9,7 +9,7 @@ const fs = require('fs');
 const logfile = "results.txt";
 
 const runtime = Date.now();
-const logdefault = "time, name, overtime, responsetime, url \n"
+const logdefault = "time, error, name, overtime, responsetime, url \n"
 if (!fs.existsSync(logfile)) {
     fs.writeFileSync(logfile, logdefault);
 }
@@ -22,7 +22,7 @@ const requests = urls.map((req) => {
 Promise.all(requests).then((results) => {
     console.log("All requests finished!");
     results.forEach((res) => {
-        let logline = runtime + ", " + res.rid + ", " + res.overtime + ", " + res.responseTime + ", " + res.url + "\n";
+        let logline = runtime + ", " + res.error + ", " + res.rid + ", " + res.overtime + ", " + res.responseTime + ", " + res.url + "\n";
         fs.appendFileSync(logfile, logline);
     });
 });
