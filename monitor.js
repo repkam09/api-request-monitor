@@ -5,11 +5,28 @@
 
 const axios = require("axios");
 const urls = require("./urls.json");
+const fs = require('fs');
+const logfile = "results.txt";
+
+const runtime = Date.now();
+const logdefault = "time, name, overtime, responsetime, url \n"
+if (!fs.existsSync(logfile)) {
+    fs.writeFileSync(logfile, logdefault);
+}
 
 const requests = urls.map((req) => {
     // Make a request via Axios to get the response time
     return makeRequest(req.rid, req.type, req.url, req.maxtime);
 });
+
+Promise.all(requests).then((results) => {
+    console.log("All requests finished!");
+    results.forEach((res) => {
+        let logline = runtime + ", " + res.rid + ", " + res.overtime + ", " + res.responseTime + ", " + res.url + "\n";
+        fs.appendFileSync(logfile, logline);
+    });
+});
+
 
 /**
  * Makes a request and returns a payload containing time, name, url, and response details
@@ -45,27 +62,10 @@ function makeRequest(rid, type, url, timeout) {
 
             if (diffTime > timeout) {
                 overtime = true;
-                console.warn("Warning: API request " + rid + " returned after the allowed time");
             }
 
             resolve({ error, responseTime: diffTime, details, rid, url, overtime: overtime });
         });
     });
 }
-
-Promise.all(requests).then((results) => {
-    console.log("All requests finished!");
-    results.forEach((res) => {
-        let addString = ", which is within the allowed time";
-        if (res.overtime) {
-            addString = ", which is outside of the allowed time! This request was slow.";
-        }
-
-        if (res.error) {
-            console.log("Request '" + res.rid + "' finished with an error: " + res.details.message + " in " + (res.responseTime / 1000) + " seconds" + addString);
-        } else {
-            console.log("Request '" + res.rid + "' finished in " + (res.responseTime / 1000) + " seconds" + addString);
-        }
-    });
-});
 
